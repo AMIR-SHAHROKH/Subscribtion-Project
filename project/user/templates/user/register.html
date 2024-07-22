@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Registration</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        .center-form {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+    </style>
+</head>
+<body>
+    <div class="container center-form">
+        <div class="col-md-6">
+            <h2 class="text-center">Register</h2>
+            <form id="registration-form">
+                <div class="form-group">
+                    <label for="username">Username</label>
+                    <input type="text" class="form-control" id="username" required>
+                </div>
+                <div class="form-group">
+                    <label for="email">Email address</label>
+                    <input type="email" class="form-control" id="email">
+                </div>
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" class="form-control" id="password" required>
+                </div>
+                <div class="form-group">
+                    <label for="password_confirm">Confirm Password</label>
+                    <input type="password" class="form-control" id="password_confirm" required>
+                </div>
+                <button type="submit" class="btn btn-primary btn-block">Register</button>
+            </form>
+            <div id="message" class="mt-3"></div>
+        </div>
+    </div>
+
+    <script>
+        $(document).ready(function() {
+            $('#registration-form').on('submit', function(event) {
+                event.preventDefault();
+
+                const data = {
+                    username: $('#username').val(),
+                    email: $('#email').val(),
+                    password: $('#password').val(),
+                    password_confirm: $('#password_confirm').val(),
+                };
+
+                $.ajax({
+                    url: 'http://127.0.0.1:8000/api/register/',  // Local API endpoint
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify(data),
+                    success: function(response) {
+                        // Store tokens in local storage
+                        localStorage.setItem('access_token', response.access);
+                        localStorage.setItem('refresh_token', response.refresh);
+                        // Redirect to welcome page
+                        window.location.href = 'http://127.0.0.1:8000/welcome/';
+                    },
+                    error: function(response) {
+                        let errorMessage = 'Registration failed. Please try again.';
+                        if (response.responseJSON) {
+                            const errors = response.responseJSON;
+                            errorMessage = '<ul>';
+                            for (const key in errors) {
+                                if (errors.hasOwnProperty(key)) {
+                                    errorMessage += `<li>${key}: ${errors[key]}</li>`;
+                                }
+                            }
+                            errorMessage += '</ul>';
+                        }
+                        $('#message').html(`<div class="alert alert-danger">${errorMessage}</div>`);
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>

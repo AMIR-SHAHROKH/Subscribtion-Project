@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welcome</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jwt-decode@3.1.2/build/jwt-decode.min.js"></script>
+</head>
+<body>
+    <div class="container text-center">
+        <h1 class="mt-5" id="welcome-message">Welcome to the Website!</h1>
+        <p class="lead">You have successfully logged in.</p>
+        <button id="logout-button" class="btn btn-primary">Logout</button>
+    </div>
+
+    <script>
+        $(document).ready(function() {
+            const accessToken = localStorage.getItem('access_token');
+            const refreshToken = localStorage.getItem('refresh_token');
+
+            // Function to refresh tokens
+            function refreshTokens() {
+                return $.ajax({
+                    url: 'http://127.0.0.1:8000/api/token/refresh/', // Refresh endpoint
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify({ "refresh": refreshToken })
+                });
+            }
+
+            // Function to logout
+            function logout() {
+                return $.ajax({
+                    url: 'http://127.0.0.1:8000/api/logout/', // Logout endpoint
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify({ "refresh_token": refreshToken }),
+                    beforeSend: function(xhr) {
+                        xhr.setRequestHeader('Authorization', 'Bearer ' + accessToken);
+                    }
+                });
+            }
+
+            // Check if the user is authenticated
+            if (accessToken) {
+                try {
+                    const decodedToken = jwt_decode(accessToken);
+                    const username = decodedToken.username;
+                    $('#welcome-message').text(`Welcome, ${username}!`);
+                } catch (error) {
+                    console.error('Token decoding failed:', error);
+                    // If token decoding fails, redirect to login
+                    window.location.href = 'http://127.0.0.1:8000/login';
+                }
+            } else {
+                // No token found, redirect to login
+                window.location.href = 'http://127.0.0.1:8000/login';
+            }
+
+            // Handle logout button click
+            $('#logout-button').click(function() {
+                if (!refreshToken) {
+                    alert('You are not logged in.');
+                    return;
+                }
+
+                // Attempt to logout directly
+                logout().done(function() {
+                    localStorage.removeItem('access_token');
+                    localStorage.removeItem('refresh_token');
+                    window.location.href = 'http://127.0.0.1:8000/login'; // Redirect to login page
+                }).fail(function(xhr) {
+                    if (xhr.status === 401) { // Token might be invalid or expired
+                        // Try to refresh tokens
+                        refreshTokens().done(function(response) {
+                            // Store new tokens
+                            localStorage.setItem('access_token', response.access);
+                            localStorage.setItem('refresh_token', response.refresh);
+
+                            // Retry the logout request
+                            logout().done(function() {
+                                localStorage.removeItem('access_token');
+                                localStorage.removeItem('refresh_token');
+                                window.location.href = 'http://127.0.0.1:8000/login'; // Redirect to login page
+                            }).fail(function(xhr) {
+                                console.error('Logout failed after refreshing tokens:', xhr.responseText);
+                                alert('Logout failed. Please log in again.');
+                                // Clear tokens and redirect to login page
+                                localStorage.removeItem('access_token');
+                                localStorage.removeItem('refresh_token');
+                                window.location.href = 'http://127.0.0.1:8000/login';
+                            });
+                        }).fail(function(xhr) {
+                            console.error('Token refresh failed:', xhr.responseText);
+                            alert('Token refresh failed. Please log in again.');
+                            // Clear tokens and redirect to login page
+                            localStorage.removeItem('access_token');
+                            localStorage.removeItem('refresh_token');
+                            window.location.href = 'http://127.0.0.1:8000/login';
+                        });
+                    } else {
+                        console.error('Logout failed:', xhr.responseText);
+                        alert('Logout failed. Please log in again.');
+                        // Clear tokens and redirect to login page
+                        localStorage.removeItem('access_token');
+                        localStorage.removeItem('refresh_token');
+                        window.location.href = 'http://127.0.0.1:8000/login';
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>

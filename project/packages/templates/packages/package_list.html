@@ -1,0 +1,7 @@
+<h2>Packages</h2>
+<ul>
+    {% for package in packages %}
+    <li>{{ package.name }} - ${{ package.price }} - {{ package.length }} days - {{ package.description }}</li>
+    {% endfor %}
+</ul>
+<a href="{% url 'add_package' %}">Add Package</a>
