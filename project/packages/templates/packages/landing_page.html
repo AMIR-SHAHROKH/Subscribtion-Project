@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Subscription Management</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <style>
+    #more-plans {
+      display: none;
+    }
+  </style>
+</head>
+<body class="bg-gray-100 text-gray-800">
+
+  <!-- Navbar -->
+  <nav class="bg-white shadow">
+    <div class="container mx-auto px-6 py-3">
+      <div class="flex justify-between items-center">
+        <div class="text-xl font-bold text-gray-900">
+          SubManage
+        </div>
+        <div>
+          <a href="#" class="text-gray-800 hover:text-gray-600 mx-4">Home</a>
+          <a href="#" class="text-gray-800 hover:text-gray-600 mx-4">Features</a>
+          <a href="#" class="text-gray-800 hover:text-gray-600 mx-4">Pricing</a>
+          <a href="#" class="text-gray-800 hover:text-gray-600 mx-4">Contact</a>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Header -->
+  <header class="bg-blue-600 text-white py-20">
+    <div class="container mx-auto text-center">
+      <h1 class="text-4xl font-bold">Welcome to SubManage</h1>
+      <p class="mt-4">Your one-stop solution for managing subscriptions</p>
+      <button class="mt-6 bg-white text-blue-600 font-semibold py-2 px-4 rounded">Get Started</button>
+    </div>
+  </header>
+
+  <!-- Subscription Status -->
+  <section class="py-20">
+    <div class="container mx-auto text-center">
+      <h2 class="text-3xl font-bold mb-8">Your Subscription Status</h2>
+      <div id="subscription-status" class="bg-white shadow-md rounded-lg p-6 w-64 mx-auto">
+        <p class="text-gray-600">You do not have an active subscription.</p>
+        <!-- Uncomment the following line if the user has an active subscription -->
+        <!-- <p class="text-gray-600">You have an active subscription: <strong>Standard Plan</strong></p> -->
+      </div>
+    </div>
+  </section>
+
+  <!-- Subscription Plans -->
+  <section class="py-20">
+    <div class="container mx-auto text-center">
+      <h2 class="text-3xl font-bold mb-8">Choose Your Plan</h2>
+      <div class="flex justify-center space-x-8">
+        <div class="bg-white shadow-md rounded-lg p-6 w-64">
+          <h3 class="text-xl font-semibold">Basic</h3>
+          <p class="mt-4 text-gray-600">$9.99/month</p>
+          <button class="mt-6 bg-blue-600 text-white font-semibold py-2 px-4 rounded">Subscribe</button>
+        </div>
+        <div class="bg-white shadow-md rounded-lg p-6 w-64">
+          <h3 class="text-xl font-semibold">Standard</h3>
+          <p class="mt-4 text-gray-600">$19.99/month</p>
+          <button class="mt-6 bg-blue-600 text-white font-semibold py-2 px-4 rounded">Subscribe</button>
+        </div>
+        <div class="bg-white shadow-md rounded-lg p-6 w-64">
+          <h3 class="text-xl font-semibold">Premium</h3>
+          <p class="mt-4 text-gray-600">$29.99/month</p>
+          <button class="mt-6 bg-blue-600 text-white font-semibold py-2 px-4 rounded">Subscribe</button>
+        </div>
+      </div>
+      <div id="more-plans" class="flex justify-center space-x-8 mt-8">
+        <div class="bg-white shadow-md rounded-lg p-6 w-64">
+          <h3 class="text-xl font-semibold">Pro</h3>
+          <p class="mt-4 text-gray-600">$39.99/month</p>
+          <button class="mt-6 bg-blue-600 text-white font-semibold py-2 px-4 rounded">Subscribe</button>
+        </div>
+        <div class="bg-white shadow-md rounded-lg p-6 w-64">
+          <h3 class="text-xl font-semibold">Enterprise</h3>
+          <p class="mt-4 text-gray-600">$49.99/month</p>
+          <button class="mt-6 bg-blue-600 text-white font-semibold py-2 px-4 rounded">Subscribe</button>
+        </div>
+      </div>
+      <button id="show-more-btn" class="mt-6 bg-gray-600 text-white font-semibold py-2 px-4 rounded">Show More</button>
+    </div>
+  </section>
+
+  <!-- Testimonials -->
+  <section class="bg-gray-200 py-20">
+    <div class="container mx-auto text-center">
+      <h2 class="text-3xl font-bold mb-8">What Our Users Say</h2>
+      <div class="space-y-8">
+        <div class="bg-white shadow-md rounded-lg p-6">
+          <p class="text-gray-600">"SubManage has simplified my life. I can manage all my subscriptions in one place!"</p>
+          <p class="mt-4 text-gray-800 font-semibold">- Alex</p>
+        </div>
+        <div class="bg-white shadow-md rounded-lg p-6">
+          <p class="text-gray-600">"Great service with excellent customer support."</p>
+          <p class="mt-4 text-gray-800 font-semibold">- Jamie</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="bg-gray-800 text-white py-6">
+    <div class="container mx-auto text-center">
+      <p>&copy; 2023 SubManage. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <script>
+    document.getElementById('show-more-btn').addEventListener('click', function() {
+      var morePlans = document.getElementById('more-plans');
+      if (morePlans.style.display === 'none' || morePlans.style.display === '') {
+        morePlans.style.display = 'flex';
+        this.innerText = 'Show Less';
+      } else {
+        morePlans.style.display = 'none';
+        this.innerText = 'Show More';
+      }
+    });
+  </script>
+
+</body>
+</html>

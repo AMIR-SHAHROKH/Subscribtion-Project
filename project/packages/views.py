@@ -1,5 +1,5 @@
 from django.contrib.auth.mixins import UserPassesTestMixin
-from django.views.generic import ListView, CreateView
+from django.views.generic import ListView, CreateView, TemplateView
 from django.urls import reverse_lazy
 from .models import Package
 from .forms import PackageForm
@@ -18,3 +18,5 @@ class PackageCreateView(UserPassesTestMixin, CreateView):
     def test_func(self):
         return self.request.user.is_superuser
 
+class Landing(TemplateView):
+    template_name = 'packages/landing_page.html'
