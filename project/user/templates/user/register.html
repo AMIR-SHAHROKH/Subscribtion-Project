@@ -36,6 +36,10 @@
                     <label for="password_confirm">Confirm Password</label>
                     <input type="password" class="form-control" id="password_confirm" required>
                 </div>
+                <div class="form-group">
+                    <label for="referral_code">Referral Code (Optional)</label>
+                    <input type="text" class="form-control" id="referral_code">
+                </div>
                 <button type="submit" class="btn btn-primary btn-block">Register</button>
             </form>
             <div id="message" class="mt-3"></div>
@@ -52,6 +56,7 @@
                     email: $('#email').val(),
                     password: $('#password').val(),
                     password_confirm: $('#password_confirm').val(),
+                    referral_code: $('#referral_code').val(),  // Include referral code in the data
                 };
 
                 $.ajax({

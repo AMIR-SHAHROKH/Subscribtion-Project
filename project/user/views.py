@@ -18,8 +18,10 @@ from rest_framework.views import APIView
 
 CustomUser = get_user_model()
 
+User = get_user_model()
+
 class RegisterView(generics.CreateAPIView):
-    queryset = CustomUser.objects.all()
+    queryset = User.objects.all()
     permission_classes = (AllowAny,)
     serializer_class = CustomUserSerializer
 
