@@ -49,3 +49,11 @@ class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
         # Add custom claims
         token['username'] = user.username
         return token
+
+    def validate(self, attrs):
+        data = super().validate(attrs)
+        
+        # Add user information to the validated data
+        data['user'] = self.user
+        
+        return data
