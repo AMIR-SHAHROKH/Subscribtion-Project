@@ -18,5 +18,3 @@ class PackageCreateView(UserPassesTestMixin, CreateView):
     def test_func(self):
         return self.request.user.is_superuser
 
-class Landing(TemplateView):
-    template_name = 'packages/landing_page.html'
