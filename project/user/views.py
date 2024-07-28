@@ -8,7 +8,8 @@ from rest_framework.views import APIView
 from rest_framework_simplejwt.views import TokenObtainPairView
 from .serializers import CustomUserSerializer, MyTokenObtainPairSerializer
 from rest_framework import status
-
+from django.views.generic import DetailView
+from user.middlewares import JWTAuthenticationMiddleware 
 User = get_user_model()
 
 class RegisterView(generics.CreateAPIView):
@@ -89,8 +90,26 @@ class Register(TemplateView):
 class WelcomeView(TemplateView):
     template_name = 'user/welcome.html'
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        if self.request.user.is_authenticated:
+            context['username'] = self.request.user.username
+        return context
+
 class Login(TemplateView):
     template_name = 'user/login.html'
-
 class Landing(TemplateView):
     template_name = 'user/landing_page.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        user = self.request.user
+
+        if user.is_authenticated:
+            context['username'] = user.username
+
+        else:
+            context['username'] = None
+
+        return context
+
