@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Subscription Management</title>
   <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/jwt-decode/build/jwt-decode.min.js"></script>
   <style>
     #more-plans {
       display: none;
@@ -20,17 +21,35 @@
         <div class="text-xl font-bold text-gray-900">
           SubManage
         </div>
-        <div>
-          <a href="#" class="text-gray-800 hover:text-gray-600 mx-4">Home</a>
-          {% if user.is_authenticated %}
-            <span class="text-gray-800 mx-4">Hello, {{ user.username }}!</span>
-            <a href="{% url 'logout' %}" class="text-gray-800 hover:text-gray-600 mx-4">Logout</a>
-          {% else %}
-            <a href="{% url 'register' %}" class="text-gray-800 hover:text-gray-600 mx-4">Sign up</a>
-            <a href="{% url 'login' %}" class="text-gray-800 hover:text-gray-600 mx-4">Login</a>
-          {% endif %}
-          <a href="#" class="text-gray-800 hover:text-gray-600 mx-4">Contact</a>
+        <div class="block md:hidden">
+          <button id="nav-toggle" class="text-gray-800 hover:text-gray-600 focus:outline-none">
+            <svg class="h-6 w-6 text-blue-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7" />
+            </svg>
+          </button>
         </div>
+        <div class="hidden md:flex space-x-4">
+          {% if username %}
+          <a href="#" class="text-gray-800 hover:text-gray-600">Home</a>
+          <a href="#" class="text-gray-800 hover:text-gray-600">Contact</a>
+          {% else %}
+          <a href="#" class="text-gray-800 hover:text-gray-600">Home</a>
+          <a href="http://127.0.0.1:8000/register/" class="text-gray-800 hover:text-gray-600">Sign up</a>
+          <a href="http://127.0.0.1:8000/login/" class="text-gray-800 hover:text-gray-600">Login</a>
+          <a href="#" class="text-gray-800 hover:text-gray-600">Contact</a>
+          {% endif %}
+        </div>
+      </div>
+      <div id="nav-menu" class="hidden md:hidden mt-2 space-y-2">
+        {% if username %}
+        <a href="#" class="block text-gray-800 hover:text-gray-600">Home</a>
+        <a href="#" class="block text-gray-800 hover:text-gray-600">Contact</a>
+        {% else %}
+        <a href="#" class="block text-gray-800 hover:text-gray-600">Home</a>
+        <a href="http://127.0.0.1:8000/register/" class="block text-gray-800 hover:text-gray-600">Sign up</a>
+        <a href="http://127.0.0.1:8000/login/" class="block text-gray-800 hover:text-gray-600">Login</a>
+        <a href="#" class="block text-gray-800 hover:text-gray-600">Contact</a>
+        {% endif %}
       </div>
     </div>
   </nav>
@@ -38,7 +57,13 @@
   <!-- Header -->
   <header class="bg-blue-600 text-white py-20">
     <div class="container mx-auto text-center">
-      <h1 class="text-4xl font-bold">Welcome to SubManage</h1>
+      <h1 class="text-4xl font-bold">
+        {% if username %}
+          Welcome to SubManage, {{ username }}!
+        {% else %}
+          Welcome to SubManage
+        {% endif %}
+      </h1>
       <p class="mt-4">Your one-stop solution for managing subscriptions</p>
       <button class="mt-6 bg-white text-blue-600 font-semibold py-2 px-4 rounded">Get Started</button>
     </div>
@@ -48,10 +73,12 @@
   <section class="py-20">
     <div class="container mx-auto text-center">
       <h2 class="text-3xl font-bold mb-8">Your Subscription Status</h2>
-      <div id="subscription-status" class="bg-white shadow-md rounded-lg p-6 w-64 mx-auto">
-        <p class="text-gray-600">You do not have an active subscription.</p>
-        <!-- Uncomment the following line if the user has an active subscription -->
-        <!-- <p class="text-gray-600">You have an active subscription: <strong>Standard Plan</strong></p> -->
+      <div id="subscription-status" class="bg-white shadow-md rounded-lg p-6 w-11/12 md:w-64 mx-auto">
+        {% if username %}
+          <p class="text-gray-600">You have an active subscription: <strong>{{ user.packages.name }}</strong></p>
+        {% else %}
+          <p class="text-gray-600">You do not have an active subscription.</p>
+        {% endif %}
       </div>
     </div>
   </section>
@@ -60,30 +87,30 @@
   <section class="py-20">
     <div class="container mx-auto text-center">
       <h2 class="text-3xl font-bold mb-8">Choose Your Plan</h2>
-      <div class="flex justify-center space-x-8">
-        <div class="bg-white shadow-md rounded-lg p-6 w-64">
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div class="bg-white shadow-md rounded-lg p-6 mx-auto w-11/12 md:w-auto">
           <h3 class="text-xl font-semibold">Basic</h3>
           <p class="mt-4 text-gray-600">$9.99/month</p>
           <button class="mt-6 bg-blue-600 text-white font-semibold py-2 px-4 rounded">Subscribe</button>
         </div>
-        <div class="bg-white shadow-md rounded-lg p-6 w-64">
+        <div class="bg-white shadow-md rounded-lg p-6 mx-auto w-11/12 md:w-auto">
           <h3 class="text-xl font-semibold">Standard</h3>
           <p class="mt-4 text-gray-600">$19.99/month</p>
           <button class="mt-6 bg-blue-600 text-white font-semibold py-2 px-4 rounded">Subscribe</button>
         </div>
-        <div class="bg-white shadow-md rounded-lg p-6 w-64">
+        <div class="bg-white shadow-md rounded-lg p-6 mx-auto w-11/12 md:w-auto">
           <h3 class="text-xl font-semibold">Premium</h3>
           <p class="mt-4 text-gray-600">$29.99/month</p>
           <button class="mt-6 bg-blue-600 text-white font-semibold py-2 px-4 rounded">Subscribe</button>
         </div>
       </div>
-      <div id="more-plans" class="flex justify-center space-x-8 mt-8">
-        <div class="bg-white shadow-md rounded-lg p-6 w-64">
+      <div id="more-plans" class="grid grid-cols-1 md:grid-cols-2 gap-8 mt-8">
+        <div class="bg-white shadow-md rounded-lg p-6 mx-auto w-11/12 md:w-auto">
           <h3 class="text-xl font-semibold">Pro</h3>
           <p class="mt-4 text-gray-600">$39.99/month</p>
           <button class="mt-6 bg-blue-600 text-white font-semibold py-2 px-4 rounded">Subscribe</button>
         </div>
-        <div class="bg-white shadow-md rounded-lg p-6 w-64">
+        <div class="bg-white shadow-md rounded-lg p-6 mx-auto w-11/12 md:w-auto">
           <h3 class="text-xl font-semibold">Enterprise</h3>
           <p class="mt-4 text-gray-600">$49.99/month</p>
           <button class="mt-6 bg-blue-600 text-white font-semibold py-2 px-4 rounded">Subscribe</button>
@@ -98,11 +125,11 @@
     <div class="container mx-auto text-center">
       <h2 class="text-3xl font-bold mb-8">What Our Users Say</h2>
       <div class="space-y-8">
-        <div class="bg-white shadow-md rounded-lg p-6">
+        <div class="bg-white shadow-md rounded-lg p-6 w-11/12 md:w-1/2 mx-auto">
           <p class="text-gray-600">"SubManage has simplified my life. I can manage all my subscriptions in one place!"</p>
           <p class="mt-4 text-gray-800 font-semibold">- Alex</p>
         </div>
-        <div class="bg-white shadow-md rounded-lg p-6">
+        <div class="bg-white shadow-md rounded-lg p-6 w-11/12 md:w-1/2 mx-auto">
           <p class="text-gray-600">"Great service with excellent customer support."</p>
           <p class="mt-4 text-gray-800 font-semibold">- Jamie</p>
         </div>
@@ -118,10 +145,15 @@
   </footer>
 
   <script>
+    document.getElementById('nav-toggle').addEventListener('click', function() {
+      var navMenu = document.getElementById('nav-menu');
+      navMenu.classList.toggle('hidden');
+    });
+
     document.getElementById('show-more-btn').addEventListener('click', function() {
       var morePlans = document.getElementById('more-plans');
       if (morePlans.style.display === 'none' || morePlans.style.display === '') {
-        morePlans.style.display = 'flex';
+        morePlans.style.display = 'grid';
         this.innerText = 'Show Less';
       } else {
         morePlans.style.display = 'none';

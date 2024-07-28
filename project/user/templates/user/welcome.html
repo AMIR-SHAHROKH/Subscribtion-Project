@@ -4,118 +4,31 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Welcome</title>
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/jwt-decode@3.1.2/build/jwt-decode.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
 </head>
-<body>
-    <div class="container text-center">
-        <h1 class="mt-5" id="welcome-message">Welcome to the Website!</h1>
-        <p class="lead">You have successfully logged in.</p>
-        <button id="logout-button" class="btn btn-primary">Logout</button>
+<body class="bg-gray-100 text-gray-800">
+
+    <!-- Container -->
+    <div class="container mx-auto text-center py-20">
+        <h1 class="text-4xl font-bold text-blue-600">
+            {% if username %}
+                Welcome to SubManage, {{ username }}!
+            {% else %}
+                Welcome to SubManage
+            {% endif %}
+        </h1>
+        <p class="mt-4 text-lg">You have successfully logged in.</p>
+        <p class="mt-2 text-gray-600">You will be redirected to the main page in 5 seconds...</p>
+        <button id="logout-button" class="mt-6 bg-blue-600 text-white font-semibold py-2 px-4 rounded hover:bg-blue-700">
+            Logout
+        </button>
     </div>
 
     <script>
-        $(document).ready(function() {
-            const accessToken = localStorage.getItem('access_token');
-            const refreshToken = localStorage.getItem('refresh_token');
-
-            // Function to refresh tokens
-            function refreshTokens() {
-                return $.ajax({
-                    url: 'http://127.0.0.1:8000/api/token/refresh/', // Refresh endpoint
-                    type: 'POST',
-                    contentType: 'application/json',
-                    data: JSON.stringify({ "refresh": refreshToken })
-                });
-            }
-
-            // Function to logout
-            function logout() {
-                return $.ajax({
-                    url: 'http://127.0.0.1:8000/api/logout/', // Logout endpoint
-                    type: 'POST',
-                    contentType: 'application/json',
-                    data: JSON.stringify({ "refresh_token": refreshToken }),
-                    beforeSend: function(xhr) {
-                        xhr.setRequestHeader('Authorization', 'Bearer ' + accessToken);
-                    }
-                });
-            }
-
-            // Check if the user is authenticated
-            if (accessToken) {
-                try {
-                    const decodedToken = jwt_decode(accessToken);
-                    const username = decodedToken.username;
-                    $('#welcome-message').text(`Welcome, ${username}!`);
-
-                    // Redirect to landing page after 3 seconds
-                    setTimeout(function() {
-                        window.location.href = 'http://127.0.0.1:8000';
-                    }, 3000);
-                } catch (error) {
-                    console.error('Token decoding failed:', error);
-                    // If token decoding fails, redirect to login
-                    window.location.href = 'http://127.0.0.1:8000/login';
-                }
-            } else {
-                // No token found, redirect to login
-                window.location.href = 'http://127.0.0.1:8000/login';
-            }
-
-            // Handle logout button click
-            $('#logout-button').click(function() {
-                if (!refreshToken) {
-                    alert('You are not logged in.');
-                    return;
-                }
-
-                // Attempt to logout directly
-                logout().done(function() {
-                    localStorage.removeItem('access_token');
-                    localStorage.removeItem('refresh_token');
-                    window.location.href = 'http://127.0.0.1:8000/login'; // Redirect to login page
-                }).fail(function(xhr) {
-                    if (xhr.status === 401) { // Token might be invalid or expired
-                        // Try to refresh tokens
-                        refreshTokens().done(function(response) {
-                            // Store new tokens
-                            localStorage.setItem('access_token', response.access);
-                            localStorage.setItem('refresh_token', response.refresh);
-
-                            // Retry the logout request
-                            logout().done(function() {
-                                localStorage.removeItem('access_token');
-                                localStorage.removeItem('refresh_token');
-                                window.location.href = 'http://127.0.0.1:8000/login'; // Redirect to login page
-                            }).fail(function(xhr) {
-                                console.error('Logout failed after refreshing tokens:', xhr.responseText);
-                                alert('Logout failed. Please log in again.');
-                                // Clear tokens and redirect to login page
-                                localStorage.removeItem('access_token');
-                                localStorage.removeItem('refresh_token');
-                                window.location.href = 'http://127.0.0.1:8000/login';
-                            });
-                        }).fail(function(xhr) {
-                            console.error('Token refresh failed:', xhr.responseText);
-                            alert('Token refresh failed. Please log in again.');
-                            // Clear tokens and redirect to login page
-                            localStorage.removeItem('access_token');
-                            localStorage.removeItem('refresh_token');
-                            window.location.href = 'http://127.0.0.1:8000/login';
-                        });
-                    } else {
-                        console.error('Logout failed:', xhr.responseText);
-                        alert('Logout failed. Please log in again.');
-                        // Clear tokens and redirect to login page
-                        localStorage.removeItem('access_token');
-                        localStorage.removeItem('refresh_token');
-                        window.location.href = 'http://127.0.0.1:8000/login';
-                    }
-                });
-            });
-        });
+        // Set a timeout to redirect after 5 seconds (5000 milliseconds)
+        setTimeout(function() {
+            window.location.href = 'http://127.0.0.1:8000/';
+        }, 5000);
     </script>
 </body>
 </html>
