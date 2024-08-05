@@ -5,8 +5,44 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Welcome</title>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <style>
+        /* Spinner styles */
+        .spinner {
+            border: 4px solid rgba(0, 0, 0, 0.1);
+            border-left-color: #3498db;
+            border-radius: 50%;
+            width: 10rem;
+            height: 10rem;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Spinner overlay styles */
+        #loading {
+            display: flex; /* Initially hidden */
+            inset: 0;
+
+            z-index: 10; /* Ensure spinner is above the text */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Fade-out animation */
+        .fade-out {
+            animation: fadeOut 1s ease-in-out forwards;
+        }
+
+        @keyframes fadeOut {
+            from { opacity: 1; }
+            to { opacity: 0; }
+        }
+    </style>
 </head>
-<body class="bg-gray-100 text-gray-800">
+<body class="bg-gray-100 text-gray-800 relative">
 
     <!-- Container -->
     <div class="container mx-auto text-center py-20">
@@ -19,16 +55,40 @@
         </h1>
         <p class="mt-4 text-lg">You have successfully logged in.</p>
         <p class="mt-2 text-gray-600">You will be redirected to the main page in 5 seconds...</p>
-        <button id="logout-button" class="mt-6 bg-blue-600 text-white font-semibold py-2 px-4 rounded hover:bg-blue-700">
-            Logout
-        </button>
+    </div>
+
+    <!-- Loading Spinner -->
+    <div id="loading" class="flex items-center justify-center">
+        <div class="spinner"></div>
     </div>
 
     <script>
-        // Set a timeout to redirect after 5 seconds (5000 milliseconds)
-        setTimeout(function() {
-            window.location.href = 'http://127.0.0.1:8000/';
-        }, 5000);
+        document.addEventListener('DOMContentLoaded', function() {
+            const loadingElement = document.getElementById('loading');
+            const redirectUrl = 'http://127.0.0.1:8000/';
+
+            // Show the loading spinner
+            loadingElement.style.display = 'flex';
+
+            // Hide the spinner and redirect after 5 seconds
+            setTimeout(function() {
+                loadingElement.classList.add('fade-out');
+                setTimeout(function() {
+                    window.location.href = redirectUrl;
+                }, 1000); // Delay to match the fade-out duration
+            }, 4000); // 4 seconds before starting the fade-out animation
+        });
+
+        document.getElementById('logout-button').addEventListener('click', function() {
+            // Show loading spinner immediately when logout button is clicked
+            const loadingElement = document.getElementById('loading');
+            loadingElement.style.display = 'flex';
+            
+            // Redirect to home page after 1 second
+            setTimeout(function() {
+                window.location.href = 'http://127.0.0.1:8000/';
+            }, 1000); // 1 second to allow the fade-out effect
+        });
     </script>
 </body>
 </html>
