@@ -10,8 +10,57 @@ from .serializers import CustomUserSerializer, MyTokenObtainPairSerializer
 from rest_framework import status
 from django.views.generic import DetailView
 from user.middlewares import JWTAuthenticationMiddleware 
+from django.urls import reverse_lazy
+from django.views.generic import DetailView
+from django.contrib.auth.mixins import LoginRequiredMixin
+from .models import CustomUser
+from rest_framework import generics
+from rest_framework.permissions import IsAuthenticated
+from .models import CustomUser
+from .serializers import CustomUserSerializer
+from rest_framework.decorators import api_view
+from django.views.decorators.csrf import csrf_exempt
+
 User = get_user_model()
 
+class UpdateProfileView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    @csrf_exempt
+    def get(self, request):
+        serializer = CustomUserSerializer(request.user)
+        return Response(serializer.data)
+
+    @csrf_exempt
+    def put(self, request):
+        serializer = CustomUserSerializer(request.user, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=400)
+
+@api_view(['GET', 'PUT'])
+def user_profile(request):
+    if request.method == 'GET':
+        serializer = CustomUserSerializer(request.user)
+        return Response(serializer.data)
+    elif request.method == 'PUT':
+        serializer = CustomUserSerializer(request.user, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=400)
+
+class UserProfileView(LoginRequiredMixin, DetailView):
+    model = CustomUser
+    template_name = 'user/profile.html'
+    context_object_name = 'user'
+    slug_field = 'username'
+    slug_url_kwarg = 'username'
+
+    def get_object(self, queryset=None):
+        return self.request.user
+    
 class RegisterView(generics.CreateAPIView):
     queryset = User.objects.all()
     permission_classes = (AllowAny,)

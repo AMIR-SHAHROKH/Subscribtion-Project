@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>User Profile</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-100 text-gray-800">
+
+  <!-- Navbar -->
+  <nav class="bg-white shadow">
+    <div class="container mx-auto px-6 py-3">
+      <div class="flex justify-between items-center">
+        <div class="text-xl font-bold text-gray-900">
+          SubManage
+        </div>
+        <div class="block md:hidden">
+          <button id="nav-toggle" class="text-gray-800 hover:text-gray-600 focus:outline-none">
+            <svg class="h-6 w-6 text-blue-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7" />
+            </svg>
+          </button>
+        </div>
+        <div class="hidden md:flex space-x-4">
+          <a href="http://127.0.0.1:8000/" class="text-gray-800 hover:text-gray-600">Home</a>
+          <a href="#" class="text-gray-800 hover:text-gray-600">Contact</a>
+          <a href="http://127.0.0.1:8000/api/logout/" class="text-gray-800 hover:text-gray-600">Logout</a>
+        </div>
+      </div>
+      <div id="nav-menu" class="hidden md:hidden mt-2 space-y-2">
+        <a href="http://127.0.0.1:8000/" class="block text-gray-800 hover:text-gray-600">Home</a>
+        <a href="#" class="block text-gray-800 hover:text-gray-600">Contact</a>
+        <a href="http://127.0.0.1:8000/api/logout/" class="block text-gray-800 hover:text-gray-600">Logout</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Header -->
+  <header class="bg-blue-600 text-white py-20">
+    <div class="container mx-auto text-center">
+      <h1 class="text-4xl font-bold">
+        Welcome, {{ user.username }}!
+      </h1>
+      <p class="mt-4">Your profile and subscription details are below.</p>
+    </div>
+  </header>
+
+  <!-- Profile Details -->
+  <section class="py-20">
+    <div class="container mx-auto px-6">
+      <div class="bg-white shadow-md rounded-lg p-6 mx-auto w-full md:w-3/4 lg:w-1/2">
+        <h2 class="text-2xl font-bold mb-6 text-center">Profile Information</h2>
+
+        <!-- Display Profile Information -->
+        <div id="profile-info" class="mb-6">
+          <div class="flex items-center justify-between mb-4">
+            <span class="text-gray-600 font-semibold">Username:</span>
+            <span id="username-display">{{ user.username }}</span>
+          </div>
+          <div class="flex items-center justify-between mb-4">
+            <span class="text-gray-600 font-semibold">Email:</span>
+            <span id="email-display">{{ user.email }}</span>
+          </div>
+          <div class="flex items-center justify-between mb-4">
+            <span class="text-gray-600 font-semibold">Referral Code:</span>
+            <span id="referral-display">{{ user.referral }}</span>
+          </div>
+          <div class="flex items-center justify-between mb-4">
+            <span class="text-gray-600 font-semibold">Friends:</span>
+            <span id="friends-display">{{ user.friends|join:", " }}</span>
+          </div>
+        </div>
+
+        <!-- Edit Profile Form -->
+        <form id="profile-form" class="hidden" onsubmit="updateProfile(event)">
+          <div class="mb-4">
+            <label for="edit-username" class="block text-gray-700">Username</label>
+            <input type="text" id="edit-username" name="username" class="w-full px-4 py-2 border rounded-lg">
+          </div>
+          <div class="mb-4">
+            <label for="edit-email" class="block text-gray-700">Email</label>
+            <input type="email" id="edit-email" name="email" class="w-full px-4 py-2 border rounded-lg">
+          </div>
+          <div class="mb-4">
+            <label for="edit-password" class="block text-gray-700">Password</label>
+            <input type="password" id="edit-password" name="password" class="w-full px-4 py-2 border rounded-lg">
+          </div>
+          <div class="mb-4">
+            <label for="edit-password-confirm" class="block text-gray-700">Confirm Password</label>
+            <input type="password" id="edit-password-confirm" name="password_confirm" class="w-full px-4 py-2 border rounded-lg">
+          </div>
+          <button type="submit" class="w-full bg-blue-600 text-white py-2 rounded-lg">Save Changes</button>
+          <button type="button" onclick="cancelEdit()" class="w-full mt-2 bg-gray-600 text-white py-2 rounded-lg">Cancel</button>
+        </form>
+
+        <!-- Edit Button -->
+        <button onclick="startEdit()" class="mt-6 w-full bg-blue-600 text-white py-2 rounded-lg">Edit Profile</button>
+
+        <!-- Display Subscription Details -->
+        {% if user.is_active_subscription %}
+          <div class="mt-6 bg-blue-600 text-white p-4 rounded-lg text-center">
+            <h3 class="text-xl font-semibold">Subscription Details</h3>
+            <p class="text-gray-200">Package: {{ user.package.name }}</p>
+            <p class="text-gray-200">Start Date: {{ user.subscription_start }}</p>
+            <p class="text-gray-200">End Date: {{ user.subscription_end }}</p>
+            <div class="relative pt-1 mb-4">
+              <div class="h-4 bg-gray-300 rounded-full overflow-hidden">
+                <div class="h-full bg-gray-600" style="width: {{ user.subscription_progress }}%;"></div>
+              </div>
+            </div>
+            <p class="text-gray-200">{{ user.days_passed }} days passed, {{ user.days_left }} days left</p>
+          </div>
+        {% else %}
+          <p class="text-gray-600 text-center mt-4">You do not have an active subscription.</p>
+        {% endif %}
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="bg-gray-800 text-white py-6">
+    <div class="container mx-auto text-center">
+      <p>&copy; 2023 SubManage. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <script>
+    function startEdit() {
+      document.getElementById('profile-info').classList.add('hidden');
+      document.getElementById('profile-form').classList.remove('hidden');
+      document.getElementById('edit-username').value = document.getElementById('username-display').textContent.trim();
+      document.getElementById('edit-email').value = document.getElementById('email-display').textContent.trim();
+    }
+
+    function cancelEdit() {
+      document.getElementById('profile-info').classList.remove('hidden');
+      document.getElementById('profile-form').classList.add('hidden');
+    }
+
+    async function updateProfile(event) {
+        event.preventDefault();
+      
+        const formData = new FormData(document.getElementById('profile-form'));
+        const data = {
+          username: formData.get('username'),
+          email: formData.get('email'),
+          password: formData.get('password'),
+          password_confirm: formData.get('password_confirm')
+        };
+      
+        const token = localStorage.getItem('token'); // Adjust if using another storage method
+      
+        try {
+          const response = await fetch('http://127.0.0.1:8000/api/profile/', {
+            method: 'PUT',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Token ${token}` // Include the token here
+            },
+            body: JSON.stringify(data)
+          });
+      
+          if (response.ok) {
+            const result = await response.json();
+            document.getElementById('username-display').textContent = result.username;
+            document.getElementById('email-display').textContent = result.email;
+            cancelEdit();
+            alert('Profile updated successfully!');
+          } else {
+            const errorData = await response.json();
+            alert('Error updating profile: ' + JSON.stringify(errorData));
+          }
+        } catch (error) {
+          console.error('Error:', error);
+          alert('An unexpected error occurred.');
+        }
+      }
+      
+  </script>
+</body>
+</html>
