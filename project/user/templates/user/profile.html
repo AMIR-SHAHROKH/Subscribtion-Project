@@ -1,10 +1,21 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>User Profile</title>
-  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Profile</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <style>
+      /* Add custom styles for the logout animation */
+      .logging-out {
+        animation: fadeOut 1s ease-in-out;
+      }
+
+      @keyframes fadeOut {
+        from { opacity: 1; }
+        to { opacity: 0; }
+      }
+    </style>
 </head>
 <body class="bg-gray-100 text-gray-800">
 
@@ -25,13 +36,13 @@
         <div class="hidden md:flex space-x-4">
           <a href="http://127.0.0.1:8000/" class="text-gray-800 hover:text-gray-600">Home</a>
           <a href="#" class="text-gray-800 hover:text-gray-600">Contact</a>
-          <a href="http://127.0.0.1:8000/api/logout/" class="text-gray-800 hover:text-gray-600">Logout</a>
+          <a href="#" id="logout-link" class="text-gray-800 hover:text-gray-600">Logout</a>
         </div>
       </div>
       <div id="nav-menu" class="hidden md:hidden mt-2 space-y-2">
         <a href="http://127.0.0.1:8000/" class="block text-gray-800 hover:text-gray-600">Home</a>
         <a href="#" class="block text-gray-800 hover:text-gray-600">Contact</a>
-        <a href="http://127.0.0.1:8000/api/logout/" class="block text-gray-800 hover:text-gray-600">Logout</a>
+        <a href="#" id="logout-link" class="block text-gray-800 hover:text-gray-600">Logout</a>
       </div>
     </div>
   </nav>
@@ -114,6 +125,12 @@
         {% else %}
           <p class="text-gray-600 text-center mt-4">You do not have an active subscription.</p>
         {% endif %}
+
+        <!-- Logout Button Centered -->
+        <div class="mt-6 flex justify-center">
+          <button id="logout-button" class="bg-red-600 text-white px-4 py-2 rounded-md">Logout</button>
+        </div>
+
       </div>
     </div>
   </section>
@@ -149,7 +166,7 @@
           password_confirm: formData.get('password_confirm')
         };
       
-        const token = localStorage.getItem('token'); // Adjust if using another storage method
+        const token = getCookie('access_token'); // Retrieve the token from cookies
       
         try {
           const response = await fetch('http://127.0.0.1:8000/api/profile/', {
@@ -176,7 +193,30 @@
           alert('An unexpected error occurred.');
         }
       }
-      
+
+    function getCookie(name) {
+      const value = `; ${document.cookie}`;
+      const parts = value.split(`; ${name}=`);
+      if (parts.length === 2) return parts.pop().split(';').shift();
+    }
+
+    function deleteCookie(name) {
+      document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/;`;
+    }
+
+    document.getElementById('logout-button').addEventListener('click', function() {
+      // Show logging out animation
+      document.body.classList.add('logging-out');
+
+      // Remove access and refresh tokens from cookies
+      deleteCookie('access_token');
+      deleteCookie('refresh_token');
+
+      // Redirect to landing page after successful logout
+      setTimeout(function() {
+        window.location.href = 'http://127.0.0.1:8000/';
+      }, 1000); // Delay to show animation
+    });
   </script>
 </body>
 </html>
