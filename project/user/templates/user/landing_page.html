@@ -64,8 +64,14 @@
           Welcome to SubManage
         {% endif %}
       </h1>
-      <p class="mt-4">Your one-stop solution for managing subscriptions</p>
-      <button class="mt-6 bg-white text-blue-600 font-semibold py-2 px-4 rounded">Get Started</button>
+      <p class="mt-4" style="margin-bottom: 15px;">Your one-stop solution for managing subscriptions</p>
+      {% if not username %}
+        <a href="http://127.0.0.1:8000/login/" id="get-started" class="mt-6 bg-white text-blue-600 font-semibold py-2 px-4 rounded">Get Started</a>
+      {% elif username %}
+       <a href="#choose-plan" id="get-started" class="mt-6 bg-white text-blue-600 font-semibold py-2 px-4 rounded">Get Started</a>
+      {% elif is_active_subscription %}
+      <p>Welcome back</p>
+      {% endif %}
     </div>
   </header>
 
@@ -78,7 +84,7 @@
           <div class="w-full mb-4 h-48 rounded-lg bg-blue-600 flex items-center justify-center text-white">
             <span class="text-2xl font-bold">{{ user.package.name }}</span>
           </div>
-          <p class="text-gray-600 mb-4">You have an active subscription: <strong></strong></p>
+          <p class="text-gray-600 mb-4">You have an active subscription: <strong>{{ user.package.name }}</strong></p>
           <p class="text-gray-600 mb-4">Start Date: <strong>{{ user.subscription_start }}</strong></p>
           <p class="text-gray-600 mb-4">End Date: <strong>{{ user.subscription_end }}</strong></p>
           <div class="relative pt-1 mb-4">
@@ -93,11 +99,9 @@
       </div>
     </div>
   </section>
-  
-  
 
   <!-- Subscription Plans -->
-  <section class="py-20">
+  <section id="choose-plan" class="py-20">
     <div class="container mx-auto text-center">
       <h2 class="text-3xl font-bold mb-8">Choose Your Plan</h2>
       <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -172,6 +176,25 @@
         morePlans.style.display = 'none';
         this.innerText = 'Show More';
       }
+    });
+
+    document.addEventListener('DOMContentLoaded', function() {
+      var getStartedBtn = document.getElementById('get-started');
+      {% if username %}
+        {% if is_active_subscription %}
+          if (getStartedBtn) {
+            getStartedBtn.style.display = 'none';
+          }
+        {% else %}
+          if (getStartedBtn) {
+            getStartedBtn.href = '#choose-plan';
+          }
+        {% endif %}
+      {% else %}
+        if (getStartedBtn) {
+          getStartedBtn.href = 'http://127.0.0.1:8000/login/';
+        }
+      {% endif %}
     });
   </script>
 

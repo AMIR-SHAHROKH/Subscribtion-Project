@@ -107,6 +107,7 @@ class Landing(TemplateView):
 
         if user.is_authenticated:
             context['username'] = user.username
+            context['is_active_subscription'] = user.is_active_subscription
 
             if user.is_active_subscription:
                 context['progress_percentage'] = (user.days_passed / user.total_days) * 100 if user.total_days > 0 else 0

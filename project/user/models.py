@@ -35,7 +35,7 @@ class CustomUser(AbstractUser):
             self.is_active_subscription = False
 
         super().save(*args, **kwargs)
-
+        
     def generate_referral_code(self):
         return str(uuid.uuid4())[:8]
 
